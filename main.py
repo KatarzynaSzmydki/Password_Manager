@@ -1,6 +1,7 @@
 
 
 from tkinter import *
+from tkinter import messagebox
 import pandas as pd
 from os.path import exists
 import random
@@ -85,7 +86,6 @@ def validate_data(type):
 
 def check_password(*args):
 
-
     password = entr_passwd.get()
     passwd_nr_numbers = len([i for i in list(password) if i in [str(j) for j in range(0, 10)]])
     passwd_nr_symbols = len([i for i in list(password) if i in znaki])
@@ -101,12 +101,21 @@ def check_password(*args):
     if passwd_nr_symbols >= nr_symbols:
         lbl_check_passwd2.config(fg=GREEN)
         lbl_check_passwd2_chck.config(fg=GREEN)
+    else:
+        lbl_check_passwd2.config(fg=RED)
+        lbl_check_passwd2_chck.config(fg=RED)
     if passwd_nr_letters_lower >= nr_letters_lower:
         lbl_check_passwd3.config(fg=GREEN)
         lbl_check_passwd3_chck.config(fg=GREEN)
+    else:
+        lbl_check_passwd3.config(fg=RED)
+        lbl_check_passwd3_chck.config(fg=RED)
     if passwd_nr_letters_upper >= nr_letters_upper:
         lbl_check_passwd4.config(fg=GREEN)
         lbl_check_passwd4_chck.config(fg=GREEN)
+    else:
+        lbl_check_passwd4.config(fg=RED)
+        lbl_check_passwd4_chck.config(fg=RED)
 
 
 # ---------------------------- ADD PASSWRD ------------------------------- #
@@ -122,12 +131,19 @@ def add_passwd():
             open_popup(window_text="Please provide correct data.")
 
         else:
-            with open('password_manager.txt', 'a') as f:
-                f.write(f'{entr_website.get()}|{entr_email.get()}|{entr_passwd.get()}\n')
 
-            open_popup(window_text=f'Password {entr_passwd.get()} successfully saved!')
-            entr_passwd.delete(0, END)
-            entr_website.delete(0, END)
+            is_ok = messagebox.askokcancel(title='Saving...', message=f'Provided details:\n'
+                                                                      f'Website: {entr_website.get()}\n'
+                                                                      f'User: {entr_email.get()}\n'
+                                                                      f'Password: {entr_passwd.get()}\n')
+
+            if is_ok:
+                with open('password_manager.txt', 'a') as f:
+                    f.write(f'{entr_website.get()}|{entr_email.get()}|{entr_passwd.get()}\n')
+
+                open_popup(window_text=f'Password {entr_passwd.get()} successfully saved!')
+                entr_passwd.delete(0, END)
+                entr_website.delete(0, END)
 
 
 
