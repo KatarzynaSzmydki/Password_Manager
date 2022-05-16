@@ -9,7 +9,7 @@ import re
 import PIL.Image
 import PIL.ImageTk
 import pyperclip
-
+import json
 
 
 # ---------------------------- CONSTANTS ------------------------------- #
@@ -28,6 +28,7 @@ nr_letters_upper = 3
 nr_letters_lower = 3
 nr_symbols = 2
 nr_numbers = 2
+email = 'kszmydki@gmail.com'
 
 
 # ---------------------------- GENERATE PASSWRD ------------------------------- #
@@ -82,7 +83,7 @@ def validate_data(type):
                 and passwd_nr_letters_lower >= nr_letters_lower and passwd_nr_letters_upper >= nr_letters_upper:
             return True
     else:
-        pass
+        return False
 
 
 
@@ -129,10 +130,7 @@ def add_passwd():
 
     else:
 
-        if not validate_data('website') == True or not validate_data('email') == True or not validate_data('password') == True:
-            open_popup(window_text="Please provide correct data.")
-
-        else:
+        if validate_data('website') == True and validate_data('email') == True and validate_data('password') == True:
 
             is_ok = messagebox.askokcancel(title='Saving...', message=f'Provided details:\n'
                                                                       f'Website: {entr_website.get()}\n'
@@ -140,13 +138,59 @@ def add_passwd():
                                                                       f'Password: {entr_passwd.get()}\n')
 
             if is_ok:
-                with open('password_manager.txt', 'a') as f:
-                    f.write(f'{entr_website.get()}|{entr_email.get()}|{entr_passwd.get()}\n')
 
-                open_popup(window_text=f'Password {entr_passwd.get()} successfully saved!')
-                entr_passwd.delete(0, END)
-                entr_website.delete(0, END)
+                new_data = {
+                    entr_website.get(): {
+                    'email': entr_email.get(),
+                    'password': entr_passwd.get()
+                    }
+                }
 
+                try:
+                    with open('password_manager.json', 'r') as f:
+                        # json.dump(new_data, f, indent=4)
+                        # f.write(f'{entr_website.get()}|{entr_email.get()}|{entr_passwd.get()}\n')
+                        data = json.load(f)
+
+                except FileNotFoundError:
+                    with open('password_manager.json', 'w') as f:
+                        json.dump(new_data, f, indent=4)
+
+                else:
+                    data.update(new_data)
+
+                    with open('password_manager.json', 'w') as f:
+                        json.dump(data, f, indent=4)
+
+                finally:
+                    open_popup(window_text=f'Password {entr_passwd.get()} successfully saved!')
+                    entr_passwd.delete(0, END)
+                    entr_website.delete(0, END)
+
+        else:
+            open_popup(window_text="Please provide correct data.")
+
+
+
+def password_search():
+
+    website = entr_website.get()
+
+    try:
+        with open('password_manager.json', 'r') as f:
+            data = json.load(f)
+
+    except FileNotFoundError:
+        open_popup(window_text="No data saved.")
+
+    else:
+
+        try:
+
+            messagebox.showinfo(title=f'{website}', message= f"User: {data[website]['email']}\n"
+                                                              f"Password: {data[website]['password']}\n")
+        except KeyError as error_message:
+            messagebox.showinfo(title=f'{website}', message=f'The key {error_message} does not exist.')
 
 
 
@@ -198,9 +242,10 @@ lbl_check_passwd4_chck.grid(column=1,row=7)
 
 
 entr_website = Entry(width=50)
-entr_website.grid(column=1,row=1, columnspan=2)
+entr_website.grid(column=1,row=1)
 entr_email = Entry(width=50)
-entr_email.grid(column=1,row=2, columnspan=2)
+entr_email.insert(0,email)
+entr_email.grid(column=1,row=2)
 entr_passwd = Entry(width=30, textvariable=var)
 entr_passwd.grid(column=1,row=3)
 
@@ -209,7 +254,8 @@ entr_passwd.grid(column=1,row=3)
 bttn_generate = Button(text='Generate Password', command=generate_passwd)
 bttn_generate.grid(column=2,row=3)
 bttn_add = Button(text='Add', command=add_passwd)
-bttn_add.grid(column=1,row=4, columnspan=2)
-
+bttn_add.grid(column=1,row=4)
+bttn_search = Button(text='Search', command=password_search)
+bttn_search.grid(column=2,row=1)
 
 window.mainloop()
