@@ -181,16 +181,14 @@ def password_search():
             data = json.load(f)
 
     except FileNotFoundError:
-        open_popup(window_text="No data saved.")
+        open_popup(window_text="No file found.")
 
     else:
-
-        try:
-
+        if website in data:
             messagebox.showinfo(title=f'{website}', message= f"User: {data[website]['email']}\n"
                                                               f"Password: {data[website]['password']}\n")
-        except KeyError as error_message:
-            messagebox.showinfo(title=f'{website}', message=f'The key {error_message} does not exist.')
+        else:
+            messagebox.showinfo(title=f'{website}', message=f'The key {website} does not exist.')
 
 
 
