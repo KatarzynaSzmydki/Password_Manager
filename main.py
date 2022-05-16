@@ -8,6 +8,7 @@ import random
 import re
 import PIL.Image
 import PIL.ImageTk
+import pyperclip
 
 
 
@@ -45,6 +46,7 @@ def generate_passwd():
 
     entr_passwd.delete(0, END)
     entr_passwd.insert(0, password)
+    pyperclip.copy(password)
 
 
 
