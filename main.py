@@ -28,7 +28,7 @@ nr_letters_upper = 3
 nr_letters_lower = 3
 nr_symbols = 2
 nr_numbers = 2
-email = 'kszmydki@gmail.com'
+email = 'XXX@gmail.com'
 
 
 # ---------------------------- GENERATE PASSWRD ------------------------------- #
